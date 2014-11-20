@@ -1,7 +1,7 @@
 julia_utils
 ===========
 
-basic utilities needed for julia coding
+basic utilities needed for scientific coding with julia
 
 scatter2d.jl: 2d scatter plots
 
