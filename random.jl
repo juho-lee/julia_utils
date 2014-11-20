@@ -5,7 +5,7 @@ function rand_cat(w::Vector{Float64})
     while r > cw[i]
         i = i + 1
     end
-    return i
+    i
 end
 
 # Algorithm:
@@ -43,7 +43,7 @@ end
 function rand_beta(a::Float64, b::Float64)
     x = rand_gamma(a, 1.0)
     y = rand_gamma(b, 1.0)
-    return x / (x+y)
+    x / (x+y)
 end
 
 # Sample from Wishart distribution using Bartlett decomposition
@@ -60,7 +60,7 @@ function rand_wishart(df::Int64, cScale::Matrix{Float64})
             A[i, j] = randn()
         end
     end
-    return cScale * A
+    cScale * A
 end
 
 function rand_mog(d::Int64, n::Int64, k::Int64; df=2*d, r = 0.08)
@@ -82,5 +82,5 @@ function rand_mog(d::Int64, n::Int64, k::Int64; df=2*d, r = 0.08)
         nk = sum(ind)
         X[:, ind] = repmat(mu,1,nk) + cSigma*randn(d,nk)
     end
-    return X, gt_labels
+    X, gt_labels
 end
