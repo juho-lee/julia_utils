@@ -8,6 +8,14 @@ function rand_cat(w::Vector{Float64})
     i
 end
 
+function rand_exp(l::Float64)
+    u = rand()
+    while u == 1
+        u = rand()
+    end
+    -log(u)/l
+end
+
 # Algorithm:
 # G. Marsaglia and W.W. Tsang, A simple method for generating gamma
 # variables, ACM Transactions on Mathematical Software, Vol. 26, No. 3,
@@ -51,7 +59,7 @@ end
 # df: degree of freedom
 # cScale: cholesky decomposition of Scale matrix (Scale = cScale * cScale')
 # return cholesky decomposition of sampled matrix
-function rand_wishart(df::Int64, cScale::Matrix{Float64})
+function rand_wishart(df::Int, cScale::Matrix{Float64})
     d = size(cScale)[1]
     A = zeros(d, d)
     for i = 1 : d
@@ -63,11 +71,18 @@ function rand_wishart(df::Int64, cScale::Matrix{Float64})
     cScale * A
 end
 
-function rand_mog(d::Int64, n::Int64, k::Int64; df=2*d, r = 0.08)
-    gt_labels = zeros(n)
-    w = ones(k)
-    for i = 1 : n
-        gt_labels[i] = rand_cat(w)
+function rand_mog(d::Int, n::Int; k=-1, gt_labels=zeros(0), df=2*d, r=0.08)
+    if isempty(gt_labels)
+        if k == -1
+            println("error; you must specify the number of clusters or ground truth labels.")
+        end
+        gt_labels = zeros(n)
+        w = ones(k)
+        for i = 1 : n
+            gt_labels[i] = rand_cat(w)
+        end
+    else
+        k = length(unique(gt_labels))
     end
     X = zeros(d, n)
     Scale = randn(d, d)
