@@ -59,7 +59,7 @@ end
 # df: degree of freedom
 # cScale: cholesky decomposition of Scale matrix (Scale = cScale * cScale')
 # return cholesky decomposition of sampled matrix
-function rand_wishart(df::Int, cScale::Matrix{Float64})
+function rand_wishart(df::Int, cScale::Triangular{Float64})
     d = size(cScale)[1]
     A = zeros(d, d)
     for i = 1 : d
@@ -87,7 +87,7 @@ function rand_mog(d::Int, n::Int; k=-1, gt_labels=zeros(0), df=2*d, r=0.08)
     X = zeros(d, n)
     Scale = randn(d, d)
     Scale = Scale*Scale' + eye(d)
-    cScale = chol(Scale)'
+    cScale = chol(Scale, :L)
     sr = sqrt(r)
     for j = 1 : k
         cLambda = rand_wishart(df, cScale)
