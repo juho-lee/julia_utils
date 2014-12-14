@@ -16,6 +16,8 @@ function rand_exp(l::Float64)
     -log(u)/l
 end
 
+# Copied from the lightspeed MATLAB tolbox 
+# (http://research.microsoft.com/en-us/um/people/minka/software/lightspeed/)
 # Algorithm:
 # G. Marsaglia and W.W. Tsang, A simple method for generating gamma
 # variables, ACM Transactions on Mathematical Software, Vol. 26, No. 3,
