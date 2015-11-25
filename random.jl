@@ -89,7 +89,7 @@ function rand_mog(d::Int, n::Int; k=-1, gt_labels=zeros(0), df=2*d, r=0.08)
     X = zeros(d, n)
     Scale = randn(d, d)
     Scale = Scale*Scale' + eye(d)
-    cScale = chol(Scale, :L)
+    cScale = chol(Scale, Val{:L})
     sr = sqrt(r)
     for j = 1 : k
         cLambda = rand_wishart(df, cScale)
