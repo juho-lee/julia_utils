@@ -1,7 +1,7 @@
 using PyPlot, PyCall
 
 # scatter plot 2d data
-function scatter2d (X::Matrix{Float64})
+function scatter2d(X::Matrix{Float64})
     if size(X)[1] != 2
         println("Only 2d data supported.\n")
     else
@@ -10,7 +10,7 @@ function scatter2d (X::Matrix{Float64})
 end
 
 # scatter plot 2d data with labels
-function scatter2d (X::Matrix{Float64}, labels)
+function scatter2d(X::Matrix{Float64}, labels)
     if size(X)[1] != 2
         println("Only 2d data supported.\n")
     else

@@ -16,7 +16,7 @@ function rand_exp(l::Float64)
     -log(u)/l
 end
 
-# Copied from the lightspeed MATLAB tolbox 
+# Copied from the lightspeed MATLAB tolbox
 # (http://research.microsoft.com/en-us/um/people/minka/software/lightspeed/)
 # Algorithm:
 # G. Marsaglia and W.W. Tsang, A simple method for generating gamma
@@ -61,7 +61,7 @@ end
 # df: degree of freedom
 # cScale: cholesky decomposition of Scale matrix (Scale = cScale * cScale')
 # return cholesky decomposition of sampled matrix
-function rand_wishart(df::Int, cScale::Triangular{Float64})
+function rand_wishart(df::Int, cScale::LowerTriangular{Float64})
     d = size(cScale)[1]
     A = zeros(d, d)
     for i = 1 : d
