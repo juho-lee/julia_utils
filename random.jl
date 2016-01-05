@@ -50,6 +50,14 @@ function rand_gamma(a::Float64, b::Float64)
     end
 end
 
+function rand_dirichlet(a::Vector)
+    x = zeros(length(a))
+    for i = 1 : length(a)
+        x[i] = rand_gamma(a[i], 1.0)
+    end
+    x / sum(x)
+end
+
 function rand_beta(a::Float64, b::Float64)
     x = rand_gamma(a, 1.0)
     y = rand_gamma(b, 1.0)
