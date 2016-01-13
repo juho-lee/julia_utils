@@ -50,6 +50,22 @@ function rand_gamma(a::Float64, b::Float64)
     end
 end
 
+function rand_gamma(a::Float64, b::Float64, dim::Int)
+    x = zeros(dim)
+    for i = 1 : dim
+        x[i] = rand_gamma(a, b)
+    end
+    x
+end
+
+function rand_gamma(a::Float64, b::Float64, dims::Dims)
+    X = zeros(dims)
+    for i in eachindex(X)
+        @inbounds X[i] = rand_gamma(a, b)
+    end
+    X
+end
+
 function rand_dirichlet(a::Vector)
     x = zeros(length(a))
     for i = 1 : length(a)
