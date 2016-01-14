@@ -80,6 +80,12 @@ function rand_beta(a::Float64, b::Float64)
     x / (x+y)
 end
 
+function rand_beta(a::Float64, b::Float64, dim::Int)
+    x = rand_gamma(a, 1.0, dim)
+    y = rand_gamma(b, 1.0, dim)
+    x ./ (x + y)
+end
+
 # Sample from Wishart distribution using Bartlett decomposition
 # http://en.wikipedia.org/wiki/Wishart_distribution
 # df: degree of freedom
