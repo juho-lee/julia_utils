@@ -1,4 +1,4 @@
-function rand_cat(w::Vector{Float64})
+function rand_cat(w::Vector)
     cw = cumsum(w)
     r = cw[end] * rand()
     i = 1
@@ -91,7 +91,7 @@ end
 # df: degree of freedom
 # cScale: cholesky decomposition of Scale matrix (Scale = cScale * cScale')
 # return cholesky decomposition of sampled matrix
-function rand_wishart(df::Int, cScale::LowerTriangular{Float64})
+function rand_wishart(df::Int, cScale::LowerTriangular)
     d = size(cScale)[1]
     A = zeros(d, d)
     for i = 1 : d
@@ -130,4 +130,36 @@ function rand_mog(d::Int, n::Int; k=-1, gt_labels=zeros(0), df=2*d, r=0.08)
         X[:, ind] = repmat(mu,1,nk) + cSigma*randn(d,nk)
     end
     X, gt_labels
+end
+
+function rand_crp(α::Float64, N::Int)
+    labels = zeros(Int, N)
+    Nk = zeros(0)
+    for n = 1 : N
+        p = [Nk; α]
+        k = rand_cat(p)
+        labels[n] = k
+        if k <= length(Nk)
+            Nk[k] += 1
+        else
+            Nk = vcat(Nk, 1.0)
+        end
+    end
+    labels
+end
+
+function rand_pyp(α::Float64, σ::Float64, N::Int)
+    labels = zeros(Int, N)
+    Nk = zeros(0)
+    for n = 1 : N
+        p = [Nk - σ; α + length(Nk)*σ]
+        k = rand_cat(p)
+        labels[n] = k
+        if k <= length(Nk)
+            Nk[k] += 1
+        else
+            Nk = vcat(Nk, 1.0)
+        end
+    end
+    labels
 end
