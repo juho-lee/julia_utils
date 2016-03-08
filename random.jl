@@ -103,33 +103,74 @@ function rand_wishart(df::Int, cScale::LowerTriangular)
     cScale * A
 end
 
-function rand_mog(d::Int, n::Int; k=-1, gt_labels=zeros(0), df=2*d, r=0.08)
-    if isempty(gt_labels)
-        if k == -1
-            println("error; you must specify the number of clusters or ground truth labels.")
+# random mixture models
+# supported distributions:
+# - gaussian (params["dist"] = "gaussian", params["d"] = 2, params["τ"] = 0.1, params["ν"] = 4)
+# - multinomial (paramas["dist"] = "mult", params["d"] = 100, params["β"] = 0.1, params["M"] = 50)
+include("corpus.jl")
+typealias ParamDict Dict{UTF8String, Any}
+function rand_mixture(gt_labels::Vector{Int}, params::ParamDict, K = 0)
+    if K == 0
+        K = length(unique(gt_labels))
+    end
+    N = length(gt_labels)
+    dist = get(params, "dist", "err")
+    if dist == "err"
+        println("error; distribution must be specified")
+        return []
+    end
+    if dist == "gaussian"
+        d = get(params, "d", 2)
+        τ = get(params, "τ", 0.1)
+        ν = get(params, "ν", 4)
+        X = zeros(d, N)
+        Scale = randn(d, d)
+        Scale = Scale*Scale' + eye(d)
+        cScale = chol(Scale, Val{:L})
+        sτ = sqrt(τ)        
+        for k = 1 : K
+            cΛ = rand_wishart(ν, cScale)
+            cΣ = inv(cΛ)'
+            μ = cΣ * randn(d) / sτ
+            ind = find(gt_labels .== k)
+            Nk = length(ind)
+            X[:,ind] = repmat(μ, 1, Nk) + cΣ*randn(d, Nk)
         end
-        gt_labels = zeros(n)
-        w = ones(k)
-        for i = 1 : n
-            gt_labels[i] = rand_cat(w)
+        return X
+    elseif dist == "mult"
+        d = get(params, "d", 100)
+        β = get(params, "β", 0.1)
+        M = get(params, "M", 50)
+        X = Corpus(N, d)
+        θ = Array(Vector, K)
+        for k = 1 : K
+            θ[k] = rand_dirichlet(fill(β, d))
+        end        
+        for n = 1 : N
+            ntrials = rand(1:M)
+            θn = θ[gt_labels[n]]
+            for i = 1 : ntrials
+                w = rand_cat(θn)
+                if get(X.doc[n], w, 0) == 0
+                    X.doc[n][w] = 1
+                else
+                    X.doc[n][w] += 1
+                end
+            end
         end
+        return X
     else
-        k = length(unique(gt_labels))
+        println("error; unsupported distribution")
+        return []
     end
-    X = zeros(d, n)
-    Scale = randn(d, d)
-    Scale = Scale*Scale' + eye(d)
-    cScale = chol(Scale, Val{:L})
-    sr = sqrt(r)
-    for j = 1 : k
-        cLambda = rand_wishart(df, cScale)
-        cSigma = inv(cLambda)'
-        mu = cSigma * randn(d) / sr
-        ind = gt_labels .== j
-        nk = sum(ind)
-        X[:, ind] = repmat(mu,1,nk) + cSigma*randn(d,nk)
+end
+
+function rand_mixture(K::Int, N::Int, params::ParamDict)
+    gt_labels = zeros(Int, N)
+    for n = 1 : N
+        gt_labels[n] = rand(1:K)
     end
-    X, gt_labels
+    (rand_mixture(gt_labels, params, K), gt_labels)
 end
 
 function rand_crp(α::Float64, N::Int)
