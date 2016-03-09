@@ -12,7 +12,7 @@ function slice_sample(log_f::Function, x0; width=10, max_iter=200, ub=Inf, lb=-I
                 xl = lb
                 break
             end
-        else                
+        else
             break
         end
     end

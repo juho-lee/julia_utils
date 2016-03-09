@@ -108,8 +108,8 @@ end
 # - gaussian (params["dist"] = "gaussian", params["d"] = 2, params["τ"] = 0.1, params["ν"] = 4)
 # - multinomial (paramas["dist"] = "mult", params["d"] = 100, params["β"] = 0.1, params["M"] = 50)
 include("corpus.jl")
-typealias ParamDict Dict{UTF8String, Any}
-function rand_mixture(gt_labels::Vector{Int}, params::ParamDict, K = 0)
+include("vararg.jl")
+function rand_mixture(gt_labels::Vector{Int}, params::VarArg, K = 0)
     if K == 0
         K = length(unique(gt_labels))
     end
@@ -128,7 +128,7 @@ function rand_mixture(gt_labels::Vector{Int}, params::ParamDict, K = 0)
         Scale = randn(d, d)
         Scale = Scale*Scale' + eye(d)
         cScale = chol(Scale, Val{:L})
-        sτ = sqrt(τ)        
+        sτ = sqrt(τ)
         for k = 1 : K
             cΛ = rand_wishart(ν, cScale)
             cΣ = inv(cΛ)'
@@ -146,7 +146,7 @@ function rand_mixture(gt_labels::Vector{Int}, params::ParamDict, K = 0)
         θ = Array(Vector, K)
         for k = 1 : K
             θ[k] = rand_dirichlet(fill(β, d))
-        end        
+        end
         for n = 1 : N
             ntrials = rand(1:M)
             θn = θ[gt_labels[n]]
@@ -166,7 +166,7 @@ function rand_mixture(gt_labels::Vector{Int}, params::ParamDict, K = 0)
     end
 end
 
-function rand_mixture(K::Int, N::Int, params::ParamDict)
+function rand_mixture(K::Int, N::Int, params::VarArg)
     gt_labels = zeros(Int, N)
     for n = 1 : N
         gt_labels[n] = rand(1:K)
